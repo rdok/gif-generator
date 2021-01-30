@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Manages domain, CDN, and go lambda.
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  DomainName:
+    Type: String
+  Route53HostedZoneId:
+    Type: String
+  WildcardCertificateARN:
+    Type: String
+Resources:
+  GIFGeneratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello-world/
+      Handler: hello-world
+      Runtime: go1.x
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /
+            Method: ANY
+  API:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Domain:
+        CertificateArn: !Ref WildcardCertificateARN
+        DomainName: !Ref DomainName
+        Route53:
+          HostedZoneId: !Ref Route53HostedZoneId
+
+
+Outputs:
+  WebEndpoint:
+    Value: !Sub "https://${DomainName}"
