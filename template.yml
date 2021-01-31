@@ -2,6 +2,8 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Manages domain, CDN, and go lambda.
 Transform: AWS::Serverless-2016-10-31
 Globals:
+  Function:
+    Timeout: 7
   Api:
     BinaryMediaTypes:
       - "*~1*"
