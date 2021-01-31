@@ -6,7 +6,7 @@
 
 Customizable: background color, line color, canvas size
 
-https://gif-generator.rdok.co.uk/?background-color=4272f5&line-color=000000&image-size=300
+https://gif-generator.rdok.co.uk/?background-color=000000&line-color=228B22&image-size=200
 
 AWS Lambda process the GO binary, and AWS API Gateway exposes the request & response.
 

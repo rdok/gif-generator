@@ -42,8 +42,6 @@ Resources:
         DomainName: !Ref DomainName
         Route53:
           HostedZoneId: !Ref Route53HostedZoneId
-
-
 Outputs:
   WebEndpoint:
     Value: !Sub "https://${DomainName}"
