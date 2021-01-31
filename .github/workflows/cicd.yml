@@ -41,12 +41,6 @@ jobs:
           echo ::set-output name=domain::"${SUBDOMAIN}${NAME}.${BASE_DOMAIN}"
           echo ::set-output name=deploy-bucket::"rdok-${ENVIRONMENT}-deployments-us-east-1"
       - run: sam build
-#      - name: Package
-#        run: |
-#          sam package \
-#            --output-template-file packaged-template.yml \
-#            --s3-prefix "${{ steps.env.outputs.stack-name }}/packages" \
-#            --s3-bucket "${{ steps.env.outputs.deploy-bucket }}"
       - name: Deploy
         run: |
           sam deploy \
