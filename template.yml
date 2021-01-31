@@ -4,10 +4,12 @@ Transform: AWS::Serverless-2016-10-31
 Globals:
   Api:
     BinaryMediaTypes:
-      - image~1jpg
-      - image~1gif
-      - image~1png
-      - application~1octet-stream
+      - "*~1*"
+# See https://github.com/aws/serverless-application-model/issues/566#issuecomment-514379203
+#    - image~1jpg
+#    - image~1gif
+#    - image~1png
+#    - application~1octet-stream
 Parameters:
   DomainName:
     Type: String
@@ -19,8 +21,8 @@ Resources:
   GIFGeneratorFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
-      Handler: src
+      CodeUri: gif-generator/
+      Handler: gif-generator
       Runtime: go1.x
       Events:
         CatchAll:
