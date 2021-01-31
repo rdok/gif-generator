@@ -26,6 +26,7 @@ jobs:
         uses: golangci/golangci-lint-action@v2.3.0
         with:
           version: v1.35
+          working-directory: gif-generator
       - run: sam validate
       - name: Prepare environment variables
         id: env
