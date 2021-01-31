@@ -19,8 +19,8 @@ Resources:
   GIFGeneratorFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: hello-world/
-      Handler: hello-world
+      CodeUri: src/
+      Handler: src
       Runtime: go1.x
       Events:
         CatchAll:
