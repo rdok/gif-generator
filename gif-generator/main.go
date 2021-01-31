@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"gopkg.in/go-playground/colors.v1"
 	"image"
 	"image/color"
 	"image/gif"
@@ -12,9 +13,8 @@ import (
 	"math/rand"
 )
 
-func handler(_ events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
-	buffer := lissajous()
+func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	buffer := lissajous(request)
 	body := buffer.String()
 	base64Encoded := base64.StdEncoding.EncodeToString([]byte(body))
 
@@ -32,7 +32,42 @@ func main() {
 	lambda.Start(handler)
 }
 
-func lissajous() bytes.Buffer {
+func lissajous(request events.APIGatewayProxyRequest) bytes.Buffer {
+	query := request.QueryStringParameters
+	backgroundColorInput := "#000000"
+	if value, ok := query["background-color"]; ok {
+		backgroundColorInput = "#" + value
+	}
+	lineColorInput := "#00FF00"
+	if value, ok := query["line-color"]; ok {
+		lineColorInput = "#" + value
+	}
+
+	backgroundColorParsed, _ := colors.Parse(backgroundColorInput)
+	backgroundColorRGBA := backgroundColorParsed.ToRGBA()
+
+	var backgroundColor = color.RGBA{
+		R: backgroundColorRGBA.R,
+		G: backgroundColorRGBA.G,
+		B: backgroundColorRGBA.B,
+		A: uint8(backgroundColorRGBA.A),
+	}
+
+	parseLineColor, _ := colors.Parse(lineColorInput)
+	lineColorRGBA := parseLineColor.ToRGBA()
+	var lineColor = color.RGBA{
+		R: lineColorRGBA.R,
+		G: lineColorRGBA.G,
+		B: lineColorRGBA.B,
+		A: uint8(lineColorRGBA.A),
+	}
+
+	var palette = []color.Color{backgroundColor, lineColor}
+
+	const (
+		blackIndex = 1 // next color in palette
+	)
+
 	const (
 		oscillatorRevolutions = 5
 		angularResolution     = 0.001
@@ -65,9 +100,3 @@ func lissajous() bytes.Buffer {
 	_ = gif.EncodeAll(&buffer, &animation) // Ignore encoding errors
 	return buffer
 }
-
-var palette = []color.Color{color.White, color.Black}
-
-const (
-	blackIndex = 1 // next color in palette
-)
