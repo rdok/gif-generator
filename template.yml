@@ -1,6 +1,13 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Manages domain, CDN, and go lambda.
 Transform: AWS::Serverless-2016-10-31
+Globals:
+  Api:
+    BinaryMediaTypes:
+      - image~1jpg
+      - image~1gif
+      - image~1png
+      - application~1octet-stream
 Parameters:
   DomainName:
     Type: String

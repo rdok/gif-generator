@@ -1,22 +1,29 @@
 package main
 
 import (
-	"encoding/json"
+	"bytes"
+	"encoding/base64"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"image"
+	"image/color"
+	"image/gif"
+	"math"
+	"math/rand"
 )
 
-func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func handler(_ events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	body := "Content"
-	response, _ := json.Marshal(&body)
+	buffer := lissajous()
+	body := buffer.String()
+	base64Encoded := base64.StdEncoding.EncodeToString([]byte(body))
 
 	return events.APIGatewayProxyResponse{
-		Body:       string(response),
-		StatusCode: 200,
+		Body:            base64Encoded,
+		StatusCode:      200,
 		IsBase64Encoded: true,
 		Headers: map[string]string{
-
+			"Content-Type": "image/gif",
 		},
 	}, nil
 }
@@ -24,3 +31,44 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 func main() {
 	lambda.Start(handler)
 }
+
+func lissajous() bytes.Buffer {
+	const (
+		oscillatorRevolutions = 5
+		angularResolution     = 0.001
+		imgCanvasSize         = 100
+		totalAnimationFrames  = 64
+		frameDelaysIn10sMS    = 8
+	)
+
+	relativeFreqYOscillator := rand.Float64() * 3.0
+	animation := gif.GIF{LoopCount: totalAnimationFrames}
+	phaseDifferences := 0.0
+
+	for frameIndex := 0; frameIndex < totalAnimationFrames; frameIndex++ {
+		rect := image.Rect(0, 0, 2*imgCanvasSize+1, 2*imgCanvasSize+1)
+		img := image.NewPaletted(rect, palette)
+		for phaseIndex := 0.0; phaseIndex < oscillatorRevolutions*2*math.Pi; phaseIndex += angularResolution {
+			x := math.Sin(phaseIndex)
+			y := math.Sin(phaseIndex * relativeFreqYOscillator * phaseDifferences)
+			img.SetColorIndex(
+				imgCanvasSize+int(x*imgCanvasSize+0.5),
+				imgCanvasSize+int(y*imgCanvasSize+0.5),
+				blackIndex,
+			)
+		}
+		phaseDifferences += 0.1
+		animation.Delay = append(animation.Delay, frameDelaysIn10sMS)
+		animation.Image = append(animation.Image, img)
+	}
+	var buffer = bytes.Buffer{}
+	_ = gif.EncodeAll(&buffer, &animation) // Ignore encoding errors
+	return buffer
+}
+
+var palette = []color.Color{color.White, color.Black}
+
+const (
+	//whiteIndex = 0 // first color in palette
+	blackIndex = 1 // next color in palette
+)

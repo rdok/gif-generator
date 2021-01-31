@@ -1,3 +1,4 @@
 start:
-    sam build
+	sam validate
+	sam build
 	sam local start-api
