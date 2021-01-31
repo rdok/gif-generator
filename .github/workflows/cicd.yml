@@ -4,6 +4,7 @@ env:
   AWS_DEFAULT_REGION: us-east-1
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  WILDCARD_CERTIFICATE_ARN: ${{ secrets.WILDCARD_CERTIFICATE_ARN }}
   BASE_DOMAIN: rdok.co.uk
 on:
   push:
@@ -24,7 +25,8 @@ jobs:
       - name: Linter
         uses: golangci/golangci-lint-action@v2.3.0
         with:
-          version: v1.29
+          version: v1.35
+      - run: sam validate
       - name: Prepare environment variables
         id: env
         env:
