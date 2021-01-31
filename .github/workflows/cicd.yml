@@ -42,6 +42,7 @@ jobs:
           echo ::set-output name=deploy-bucket::"rdok-${ENVIRONMENT}-deployments-us-east-1"
       - name: CloudFormation Package & Deploy
         run: |
+          sam build
           sam package \
             --output-template-file packaged-template.yml \
             --s3-prefix "${{ steps.env.outputs.stack-name }}/packages" \
