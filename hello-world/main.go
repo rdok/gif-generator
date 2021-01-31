@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -40,8 +41,11 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return events.APIGatewayProxyResponse{}, ErrNoIP
 	}
 
+	body := fmt.Sprintf("Hello, %v", string(ip))
+	response, err := json.Marshal(&body)
+
 	return events.APIGatewayProxyResponse{
-		Body:       fmt.Sprintf("Hello, %v", string(ip)),
+		Body: string(response)       ,
 		StatusCode: 200,
 	}, nil
 }
