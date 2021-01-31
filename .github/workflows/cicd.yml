@@ -40,18 +40,19 @@ jobs:
           echo ::set-output name=stack-name::"rdok-${ENVIRONMENT}-${NAME}"
           echo ::set-output name=domain::"${SUBDOMAIN}${NAME}.${BASE_DOMAIN}"
           echo ::set-output name=deploy-bucket::"rdok-${ENVIRONMENT}-deployments-us-east-1"
-      - name: CloudFormation Package & Deploy
+      - run: sam build
+#      - name: Package
+#        run: |
+#          sam package \
+#            --output-template-file packaged-template.yml \
+#            --s3-prefix "${{ steps.env.outputs.stack-name }}/packages" \
+#            --s3-bucket "${{ steps.env.outputs.deploy-bucket }}"
+      - name: Deploy
         run: |
-          sam build
-          sam package \
-            --output-template-file packaged-template.yml \
-            --s3-prefix "${{ steps.env.outputs.stack-name }}/packages" \
-            --s3-bucket "${{ steps.env.outputs.deploy-bucket }}"
           sam deploy \
             --no-fail-on-empty-changeset \
             --s3-bucket "${{ steps.env.outputs.deploy-bucket }}" \
             --s3-prefix "${{ steps.env.outputs.stack-name }}/deployments" \
-            --template-file packaged-template.yml \
             --stack-name ${{ steps.env.outputs.stack-name }} \
             --capabilities CAPABILITY_IAM \
             --parameter-overrides \
