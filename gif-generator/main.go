@@ -11,6 +11,7 @@ import (
 	"image/gif"
 	"math"
 	"math/rand"
+	"strconv"
 )
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -34,13 +35,19 @@ func main() {
 
 func lissajous(request events.APIGatewayProxyRequest) bytes.Buffer {
 	query := request.QueryStringParameters
+
 	backgroundColorInput := "#000000"
 	if value, ok := query["background-color"]; ok {
 		backgroundColorInput = "#" + value
 	}
+
 	lineColorInput := "#00FF00"
 	if value, ok := query["line-color"]; ok {
 		lineColorInput = "#" + value
+	}
+	imgCanvasSize := 100
+	if value, ok := query["image-size"]; ok {
+		imgCanvasSize, _ = strconv.Atoi(value)
 	}
 
 	backgroundColorParsed, _ := colors.Parse(backgroundColorInput)
@@ -71,7 +78,6 @@ func lissajous(request events.APIGatewayProxyRequest) bytes.Buffer {
 	const (
 		oscillatorRevolutions = 5
 		angularResolution     = 0.001
-		imgCanvasSize         = 100
 		totalAnimationFrames  = 64
 		frameDelaysIn10sMS    = 8
 	)
@@ -87,8 +93,8 @@ func lissajous(request events.APIGatewayProxyRequest) bytes.Buffer {
 			x := math.Sin(phaseIndex)
 			y := math.Sin(phaseIndex * relativeFreqYOscillator * phaseDifferences)
 			img.SetColorIndex(
-				imgCanvasSize+int(x*imgCanvasSize+0.5),
-				imgCanvasSize+int(y*imgCanvasSize+0.5),
+				imgCanvasSize+int(x*float64(imgCanvasSize)+0.5),
+				imgCanvasSize+int(y*float64(imgCanvasSize)+0.5),
 				blackIndex,
 			)
 		}
